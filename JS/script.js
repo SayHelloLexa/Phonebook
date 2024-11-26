@@ -64,7 +64,7 @@ const data = [
     main.mainContainer = mainContainer;
 
     return main;
-  }
+  };
 
   const createFooter = (title) => {
     const footer = document.createElement('footer');
@@ -75,7 +75,7 @@ const data = [
 
     footer.append(footerContainer);
     footer.footerContainer = footerContainer;
-  
+
     return footer;
   };
 
@@ -118,7 +118,7 @@ const data = [
     table.tbody = tbody;
 
     table.append(thead, tbody);
-    
+
     return table;
   };
 
@@ -144,22 +144,22 @@ const data = [
 
       <div class="form-group">
         <label class="form-label" for="phone">Телефон:</label>
-        <input class="form-input" name="phone" id="phone" type="number" required>
+        <input class="form-input" name="phone" id="phone" type="tel" required>
       </div>
     `);
 
     const buttonGroup = createButtonsGroup(
-      [{
-        className: 'btn btn-primary mr-3',
-        type: 'submit',
-        text: 'Добавить',
-      },
+        [{
+          className: 'btn btn-primary mr-3',
+          type: 'submit',
+          text: 'Добавить',
+        },
 
-      {
-        className: 'btn btn-danger',
-        type: 'reset',
-        text: 'Отмена',
-      }]
+        {
+          className: 'btn btn-danger',
+          type: 'reset',
+          text: 'Отмена',
+        }],
     );
 
     form.append(...buttonGroup.btns);
@@ -168,7 +168,7 @@ const data = [
     return {
       overlay,
       form,
-    }
+    };
   };
 
   const createRow = ({name: firstName, surname, phone}) => {
@@ -190,29 +190,30 @@ const data = [
     const phoneLink = document.createElement('a');
     phoneLink.href = `tel:${phone}`;
     phoneLink.textContent = phone;
+    tr.phoneLink = phoneLink;
 
     tdPhone.append(phoneLink);
     tr.append(tdDel, tdname, tdSurname, tdPhone);
 
     return tr;
-  }
+  };
 
   const renderPhoneBook = (app, title) => {
     const header = createHeader();
     const logo = createLogo(title);
     const main = createMain();
     const buttonGroup = createButtonsGroup(
-      [{
-        className: 'btn btn-primary mr-3',
-        type: 'button',
-        text: 'Добавить',
-      },
+        [{
+          className: 'btn btn-primary mr-3',
+          type: 'button',
+          text: 'Добавить',
+        },
 
-      {
-        className: 'btn btn-danger',
-        type: 'button',
-        text: 'Удалить',
-      }]
+        {
+          className: 'btn btn-danger',
+          type: 'button',
+          text: 'Удалить',
+        }],
     );
     const table = createTable();
     const form = createForm();
@@ -224,22 +225,63 @@ const data = [
 
     return {
       list: table.tbody,
-    }
+      logo,
+      btnAdd: buttonGroup.btns[0],
+      formOverlay: form.overlay,
+    };
   };
 
   const renderContacts = (elem, data) => {
     const allRow = data.map(createRow);
     elem.append(...allRow);
+
+    return allRow;
+  };
+
+  const hoverRow = (allRow, logo) => {
+    const text = logo.textContent;
+    allRow.forEach(contact => {
+      contact.addEventListener('mouseenter', () => {
+        logo.textContent = contact.phoneLink.textContent;
+      });
+
+      contact.addEventListener('mouseleave', () => {
+        logo.textContent = text;
+      });
+    },
+    );
   };
 
   const init = (selectorApp, title) => {
     const app = document.querySelector(selectorApp); // #app
     const phoneBook = renderPhoneBook(app, title);
 
-    const {list} = phoneBook;
-    renderContacts(list, data);
+    const {list, logo, btnAdd, formOverlay} = phoneBook;
+
     // Функционал
-  }
+    const allRow = renderContacts(list, data);
+    hoverRow(allRow, logo);
+
+    const objEvent = {
+      handleEvent(event) {
+        if (event.ctrlKey) {
+          this.bar();
+        } else {
+          this.foo();
+        }
+      },
+
+      bar() {
+        document.body.style.backgroundColor = 'black';
+      },
+
+      foo() {
+        formOverlay.classList.add('is-visible');
+      },
+    };
+
+    btnAdd.addEventListener('click', objEvent);
+  };
 
   window.phoneBookInit = init;
 }
