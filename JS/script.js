@@ -108,6 +108,7 @@ const data = [
     thead.insertAdjacentHTML('beforeend', `
       <tr>
         <th class="delete">Удалить</th>
+        <th class="edit"></th>
         <th>Имя</th>
         <th>Фамилия</th>
         <th>Телефон</th>
@@ -192,8 +193,14 @@ const data = [
     phoneLink.textContent = phone;
     tr.phoneLink = phoneLink;
 
+    const tdEdit = document.createElement('td');
+    const editBtn = document.createElement('button');
+    editBtn.classList.add('edit-btn', 'btn-primary');
+    editBtn.textContent = 'Редактировать';
+    tdEdit.append(editBtn);
+
     tdPhone.append(phoneLink);
-    tr.append(tdDel, tdname, tdSurname, tdPhone);
+    tr.append(tdDel, tdEdit, tdname, tdSurname, tdPhone,);
 
     return tr;
   };
@@ -204,7 +211,7 @@ const data = [
     const main = createMain();
     const buttonGroup = createButtonsGroup(
         [{
-          className: 'btn btn-primary mr-3',
+          className: 'btn btn-primary mr-3 js-add',
           type: 'button',
           text: 'Добавить',
         },
@@ -228,6 +235,7 @@ const data = [
       logo,
       btnAdd: buttonGroup.btns[0],
       formOverlay: form.overlay,
+      form: form.form,
     };
   };
 
@@ -256,31 +264,35 @@ const data = [
     const app = document.querySelector(selectorApp); // #app
     const phoneBook = renderPhoneBook(app, title);
 
-    const {list, logo, btnAdd, formOverlay} = phoneBook;
+    const {list, logo, btnAdd, formOverlay, form} = phoneBook;
 
     // Функционал
     const allRow = renderContacts(list, data);
     hoverRow(allRow, logo);
 
-    const objEvent = {
-      handleEvent(event) {
-        if (event.ctrlKey) {
-          this.bar();
-        } else {
-          this.foo();
-        }
-      },
+    btnAdd.addEventListener('click', () => {
+      formOverlay.classList.add('is-visible');
+    });
 
-      bar() {
-        document.body.style.backgroundColor = 'black';
-      },
+    form.addEventListener('click', event => {
+      event.stopPropagation();
+    });
 
-      foo() {
-        formOverlay.classList.add('is-visible');
-      },
-    };
+    formOverlay.addEventListener('click', () => {
+      formOverlay.classList.remove('is-visible');
+    });
 
-    btnAdd.addEventListener('click', objEvent);
+    document.addEventListener('touchstart', e => {
+      console.log(e);
+    });
+
+    document.addEventListener('touchmove', e => {
+      console.log(e);
+    });
+
+    document.addEventListener('touchend', e => {
+      console.log(e);
+    });
   };
 
   window.phoneBookInit = init;
