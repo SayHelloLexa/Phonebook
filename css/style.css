@@ -47,7 +47,11 @@ body {
   margin-bottom: 30px;
 }
 
-
+.edit-btn {
+  border: none;
+  background-color: #3E5E93;
+  cursor: pointer;
+}
 
 .form {
   padding: 30px 50px;
