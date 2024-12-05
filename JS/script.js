@@ -108,6 +108,7 @@ const data = [
     thead.insertAdjacentHTML('beforeend', `
       <tr>
         <th class="delete">Удалить</th>
+        <th class="edit"></th>
         <th>Имя</th>
         <th>Фамилия</th>
         <th>Телефон</th>
@@ -173,6 +174,8 @@ const data = [
 
   const createRow = ({name: firstName, surname, phone}) => {
     const tr = document.createElement('tr');
+    tr.classList.add('contact');
+
     const tdDel = document.createElement('td');
 
     const buttonDel = document.createElement('button');
@@ -192,8 +195,14 @@ const data = [
     phoneLink.textContent = phone;
     tr.phoneLink = phoneLink;
 
+    const tdEdit = document.createElement('td');
+    const editBtn = document.createElement('button');
+    editBtn.classList.add('edit-btn', 'btn-primary');
+    editBtn.textContent = 'Редактировать';
+    tdEdit.append(editBtn);
+
     tdPhone.append(phoneLink);
-    tr.append(tdDel, tdname, tdSurname, tdPhone);
+    tr.append(tdDel, tdEdit, tdname, tdSurname, tdPhone,);
 
     return tr;
   };
@@ -204,7 +213,7 @@ const data = [
     const main = createMain();
     const buttonGroup = createButtonsGroup(
         [{
-          className: 'btn btn-primary mr-3',
+          className: 'btn btn-primary mr-3 js-add',
           type: 'button',
           text: 'Добавить',
         },
@@ -227,7 +236,9 @@ const data = [
       list: table.tbody,
       logo,
       btnAdd: buttonGroup.btns[0],
+      btnDel: buttonGroup.btns[1],
       formOverlay: form.overlay,
+      form: form.form,
     };
   };
 
@@ -256,31 +267,70 @@ const data = [
     const app = document.querySelector(selectorApp); // #app
     const phoneBook = renderPhoneBook(app, title);
 
-    const {list, logo, btnAdd, formOverlay} = phoneBook;
+    const {
+      list, 
+      logo, 
+      btnAdd, 
+      formOverlay, 
+      form,
+      btnDel,
+    } = phoneBook;
 
     // Функционал
     const allRow = renderContacts(list, data);
     hoverRow(allRow, logo);
 
-    const objEvent = {
-      handleEvent(event) {
-        if (event.ctrlKey) {
-          this.bar();
-        } else {
-          this.foo();
-        }
-      },
+    btnAdd.addEventListener('click', () => {
+      formOverlay.classList.add('is-visible');
+    });
 
-      bar() {
-        document.body.style.backgroundColor = 'black';
-      },
+    formOverlay.addEventListener('click', e => {
+      const target = e.target;
+      
+      if (target === formOverlay || 
+        target.classList.contains('close')) { 
+        formOverlay.classList.remove('is-visible');
+      }
+    });
 
-      foo() {
-        formOverlay.classList.add('is-visible');
-      },
-    };
+    document.addEventListener('touchstart', e => {
+      console.log(e);
+    });
 
-    btnAdd.addEventListener('click', objEvent);
+    document.addEventListener('touchmove', e => {
+      console.log(e);
+    });
+
+    document.addEventListener('touchend', e => {
+      console.log(e);
+    });
+
+    btnDel.addEventListener('click', () => {
+      document.querySelectorAll('.delete').forEach(del => {
+        del.classList.toggle('is-visible');
+      })
+    });
+
+    list.addEventListener('click', e => {
+      console.log(e.target);
+    });
+
+    list.addEventListener('click', e => {
+      const target = e.target;
+
+      if (target.closest('.del-icon')) {
+        target.closest('.contact').remove();
+      }
+    });
+
+    setTimeout(() => {
+      const contact = createRow({
+        name: 'Алексей',
+        surname: 'Карпов',
+        phone: '+79876543210',
+      });
+      list.append(contact);
+    }, 2000);
   };
 
   window.phoneBookInit = init;
