@@ -174,6 +174,8 @@ const data = [
 
   const createRow = ({name: firstName, surname, phone}) => {
     const tr = document.createElement('tr');
+    tr.classList.add('contact');
+
     const tdDel = document.createElement('td');
 
     const buttonDel = document.createElement('button');
@@ -234,6 +236,7 @@ const data = [
       list: table.tbody,
       logo,
       btnAdd: buttonGroup.btns[0],
+      btnDel: buttonGroup.btns[1],
       formOverlay: form.overlay,
       form: form.form,
     };
@@ -264,7 +267,14 @@ const data = [
     const app = document.querySelector(selectorApp); // #app
     const phoneBook = renderPhoneBook(app, title);
 
-    const {list, logo, btnAdd, formOverlay, form} = phoneBook;
+    const {
+      list, 
+      logo, 
+      btnAdd, 
+      formOverlay, 
+      form,
+      btnDel,
+    } = phoneBook;
 
     // Функционал
     const allRow = renderContacts(list, data);
@@ -274,12 +284,13 @@ const data = [
       formOverlay.classList.add('is-visible');
     });
 
-    form.addEventListener('click', event => {
-      event.stopPropagation();
-    });
-
-    formOverlay.addEventListener('click', () => {
-      formOverlay.classList.remove('is-visible');
+    formOverlay.addEventListener('click', e => {
+      const target = e.target;
+      
+      if (target === formOverlay || 
+        target.classList.contains('close')) { 
+        formOverlay.classList.remove('is-visible');
+      }
     });
 
     document.addEventListener('touchstart', e => {
@@ -293,6 +304,33 @@ const data = [
     document.addEventListener('touchend', e => {
       console.log(e);
     });
+
+    btnDel.addEventListener('click', () => {
+      document.querySelectorAll('.delete').forEach(del => {
+        del.classList.toggle('is-visible');
+      })
+    });
+
+    list.addEventListener('click', e => {
+      console.log(e.target);
+    });
+
+    list.addEventListener('click', e => {
+      const target = e.target;
+
+      if (target.closest('.del-icon')) {
+        target.closest('.contact').remove();
+      }
+    });
+
+    setTimeout(() => {
+      const contact = createRow({
+        name: 'Алексей',
+        surname: 'Карпов',
+        phone: '+79876543210',
+      });
+      list.append(contact);
+    }, 2000);
   };
 
   window.phoneBookInit = init;
