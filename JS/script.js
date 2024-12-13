@@ -29,6 +29,7 @@ const data = [
 {
   const addContactData = (contact) => {
     data.push(contact);
+    setStorage('contacts', contact);
   };
   const createContainer = () => {
     const container = document.createElement('div');
@@ -262,8 +263,7 @@ const data = [
       contact.addEventListener('mouseleave', () => {
         logo.textContent = text;
       });
-    },
-    );
+    });
   };
 
   const modalControl = (btnAdd, formOverlay) => {
@@ -306,7 +306,10 @@ const data = [
       const target = e.target;
 
       if (target.closest('.del-icon')) {
-        target.closest('.contact').remove();
+        const contact = target.closest('.contact');
+        const phone = contact.querySelector('a').textContent;
+        contact.remove();
+        removeStorage(phone);
       }
     });
   };
@@ -329,6 +332,34 @@ const data = [
     });
   }
 
+  // Получить данные из хранилища
+  const getStorage = (key) => {
+    const data = localStorage.getItem(key) // возвращает строку
+
+    if (!data) {
+      return [];
+    };
+
+    return JSON.parse(data);
+  };
+
+  // Записать данные в хранилище
+  const setStorage = (key, obj) => {
+    const arr = getStorage(key);
+    arr.push(obj);
+
+    localStorage.setItem(key, JSON.stringify(arr));
+  };
+
+  // Удалить данные из хранилища
+  const removeStorage = (phone) => {
+    const key = 'contacts';
+    const arr = JSON.parse(localStorage.getItem(key));
+    const remArr = arr.filter(item => item.phone !== phone);
+
+    localStorage.setItem(key, JSON.stringify(remArr));
+  };
+
   const init = (selectorApp, title) => {
     const app = document.querySelector(selectorApp);
 
@@ -339,25 +370,18 @@ const data = [
       formOverlay, 
       form,
       btnDel,
-    } = renderPhoneBook(app, title);;
+    } = renderPhoneBook(app, title);
 
-    // Функционал
-    const allRow = renderContacts(list, data);
+    const storageData = getStorage('contacts');
+    const combineData = [...data, ...storageData];
+
+
+    const allRow = renderContacts(list, combineData);
 
     const {closeModal} = modalControl(btnAdd, formOverlay);
     hoverRow(allRow, logo);
     deleteControl(btnDel, list);
     formControl(form, list, closeModal);
-
-
-    setTimeout(() => {
-      const contact = createRow({
-        name: 'Алексей',
-        surname: 'Карпов',
-        phone: '+79876543210',
-      });
-      list.append(contact);
-    }, 2000);
   };
 
   window.phoneBookInit = init;
